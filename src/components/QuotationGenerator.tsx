@@ -152,7 +152,14 @@ const QuotationGenerator: React.FC = () => {
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(dataBlob);
-    link.download = `報價單完整資料_${new Date().toISOString().split('T')[0]}.json`;
+
+    // 使用與 PDF 匯出相同的命名邏輯
+    const dateString = formData.startDate || new Date().toISOString().split('T')[0];
+    const fileName = formData.quotationName
+      ? `${formData.quotationName}_完整資料_${dateString}.json`
+      : `${new Date().toLocaleDateString('zh-TW')}_quotation_完整資料.json`;
+
+    link.download = fileName;
     link.click();
   };
 
@@ -167,9 +174,13 @@ const QuotationGenerator: React.FC = () => {
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(dataBlob);
+
+    // 使用與 PDF 匯出相同的命名邏輯
+    const dateString = formData.startDate || new Date().toISOString().split('T')[0];
     const fileName = formData.quotationName
-      ? `${formData.quotationName}_${new Date().toISOString().split('T')[0]}.json`
-      : `當前報價單_${new Date().toISOString().split('T')[0]}.json`;
+      ? `${formData.quotationName}_${dateString}.json`
+      : `${new Date().toLocaleDateString('zh-TW')}_quotation.json`;
+
     link.download = fileName;
     link.click();
   };

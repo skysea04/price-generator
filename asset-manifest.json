@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/price-generator/static/css/main.c877eb76.css",
+    "main.js": "/price-generator/static/js/main.16bdda9b.js",
+    "static/js/977.5eb528d5.chunk.js": "/price-generator/static/js/977.5eb528d5.chunk.js",
+    "static/js/455.b778bed1.chunk.js": "/price-generator/static/js/455.b778bed1.chunk.js",
+    "index.html": "/price-generator/index.html",
+    "main.c877eb76.css.map": "/price-generator/static/css/main.c877eb76.css.map",
+    "main.16bdda9b.js.map": "/price-generator/static/js/main.16bdda9b.js.map",
+    "977.5eb528d5.chunk.js.map": "/price-generator/static/js/977.5eb528d5.chunk.js.map",
+    "455.b778bed1.chunk.js.map": "/price-generator/static/js/455.b778bed1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c877eb76.css",
+    "static/js/main.16bdda9b.js"
+  ]
+}

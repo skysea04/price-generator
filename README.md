@@ -1,6 +1,23 @@
-# Getting Started with Create React App
+# 報價單產生器 (Price Generator)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+一個基於 React 的報價單產生器，支援拖拽排序、Excel/Google Sheets 數據導入、PDF 匯出等功能。
+
+## 功能特色
+
+- 📋 **Excel/Google Sheets 導入**：直接貼上數據，自動解析並導入
+- 🎯 **拖拽排序**：支援服務項目的拖拽排序
+- 📄 **PDF 匯出**：生成專業的報價單 PDF
+- 💾 **歷史記錄**：自動保存報價單歷史
+- 🎨 **自定義 LOGO**：支援客戶 LOGO 上傳
+- 📊 **稅率計算**：自動計算稅金和總價
+
+## 技術架構
+
+- **前端框架**: React 19 + TypeScript
+- **樣式框架**: Bootstrap 5
+- **拖拽功能**: @dnd-kit
+- **PDF 生成**: jsPDF + html2canvas
+- **部署平台**: GitHub Pages
 
 ## Available Scripts
 
@@ -27,7 +44,40 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### `npm run deploy`
+
+Deploys the app to GitHub Pages.\
+This command will:
+1. Build the app for production
+2. Deploy to the `gh-pages` branch
+3. Make it available at: https://yuhsuan.github.io/price-generator-react
+
+## GitHub Pages 部署
+
+### 前置條件
+1. 確保你的 GitHub 倉庫名稱為 `price-generator-react`
+2. 確保你有該倉庫的寫入權限
+
+### 部署步驟
+1. 提交所有更改到 GitHub：
+   ```bash
+   git add .
+   git commit -m "Add GitHub Pages deployment"
+   git push origin main
+   ```
+
+2. 執行部署命令：
+   ```bash
+   npm run deploy
+   ```
+
+3. 等待部署完成，你的應用程序將在以下地址可用：
+   **https://yuhsuan.github.io/price-generator-react**
+
+### 注意事項
+- 首次部署可能需要幾分鐘時間
+- 如果更改了 `homepage` 設置，需要重新部署
+- 部署後可能需要清除瀏覽器緩存
 
 ### `npm run eject`
 

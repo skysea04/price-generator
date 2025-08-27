@@ -1,38 +1,71 @@
-.App {
-  text-align: center;
+/* 隱藏數字輸入框的調整按鈕 */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* 增強表單欄位顯示效果 */
+.form-control,
+.form-select {
+  border: 2px solid #ced4da !important;
+  background-color: #f8f9fa !important;
+  font-size: 16px !important;
+  padding: 12px 16px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.form-control:focus,
+.form-select:focus {
+  border-color: #0d6efd !important;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+  background-color: #ffffff !important;
 }
 
-.App-link {
-  color: #61dafb;
+.form-control:hover,
+.form-select:hover {
+  border-color: #adb5bd !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
+/* 標籤樣式增強 */
+.form-label {
+  font-weight: 600 !important;
+  color: #495057 !important;
+  margin-bottom: 8px !important;
+  font-size: 16px !important;
+}
+
+/* 卡片樣式增強 */
+.card {
+  border: none !important;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+  border-radius: 12px !important;
+  margin-bottom: 24px !important;
+}
+
+.card-body {
+  padding: 24px !important;
+}
+
+/* 按鈕樣式增強 */
+.btn {
+  font-weight: 600 !important;
+  padding: 10px 20px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+}
+
+.modal.show {
+  display: block !important;
+}
+
+@media print {
+  .modal-footer {
+    display: none !important;
   }
 }

@@ -50,13 +50,14 @@ Deploys the app to GitHub Pages.\
 This command will:
 1. Build the app for production
 2. Deploy to the `gh-pages` branch
-3. Make it available at: https://yuhsuan.github.io/price-generator
+3. Make it available at: https://skysea04.github.io/price-generator
 
 ## GitHub Pages 部署
 
 ### 前置條件
 1. 確保你的 GitHub 倉庫名稱為 `price-generator`
-2. 確保你有該倉庫的寫入權限
+2. 確保你的 GitHub 用戶名為 `skysea04`
+3. 確保你有該倉庫的寫入權限
 
 ### 部署步驟
 1. 提交所有更改到 GitHub：
@@ -72,7 +73,7 @@ This command will:
    ```
 
 3. 等待部署完成，你的應用程序將在以下地址可用：
-   **https://yuhsuan.github.io/price-generator**
+   **https://skysea04.github.io/price-generator**
 
 ### 注意事項
 - 首次部署可能需要幾分鐘時間

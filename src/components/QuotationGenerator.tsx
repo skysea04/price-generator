@@ -674,7 +674,7 @@ const QuotationGenerator: React.FC = () => {
                   title="複製服務項目到剪貼板"
                   style={{ backgroundColor: '#28a745', color: 'white', borderColor: '#28a745' }}
                 >
-                  📄 複製項目
+                  📄 複製項目（可貼至 Excel / Google Sheet）
                 </button>
                 <button
                   type="button"

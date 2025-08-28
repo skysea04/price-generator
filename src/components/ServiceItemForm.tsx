@@ -55,15 +55,23 @@ const ServiceItemForm: React.FC<ServiceItemFormProps> = ({
       {showHeaders && (
         <div className="row g-2 mb-2">
           <div className="col-md-2">
-            <label className="form-label small fw-bold text-muted">類別</label>
+            <div className="d-flex gap-2 align-items-center">
+              <div className="btn btn-sm btn-outline-secondary" style={{ cursor: 'default', minWidth: '30px', visibility: 'hidden' }}>
+                ⋮⋮
+              </div>
+              <label className="form-label small fw-bold text-muted mb-0">類別</label>
+            </div>
           </div>
-          <div className="col-md-3">
+          <div className="col-md-2">
             <label className="form-label small fw-bold text-muted">項目</label>
+          </div>
+          <div className="col-md-2">
+            <label className="form-label small fw-bold text-muted">內容</label>
           </div>
           <div className="col-md-2">
             <label className="form-label small fw-bold text-muted">單價</label>
           </div>
-          <div className="col-md-2">
+          <div className="col-md-1">
             <label className="form-label small fw-bold text-muted">數量</label>
           </div>
           <div className="col-md-1">
@@ -99,13 +107,22 @@ const ServiceItemForm: React.FC<ServiceItemFormProps> = ({
             />
           </div>
         </div>
-        <div className="col-md-3">
+        <div className="col-md-2">
           <input
             type="text"
             className="form-control"
             placeholder="項目"
             value={item.item}
             onChange={(e) => handleChange('item', e.target.value)}
+          />
+        </div>
+        <div className="col-md-2">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="內容"
+            value={item.content || ''}
+            onChange={(e) => handleChange('content', e.target.value)}
           />
         </div>
         <div className="col-md-2">
@@ -117,7 +134,7 @@ const ServiceItemForm: React.FC<ServiceItemFormProps> = ({
             onChange={(e) => handleChange('price', parseFloat(e.target.value) || 0)}
           />
         </div>
-        <div className="col-md-2">
+        <div className="col-md-1">
           <input
             type="number"
             className="form-control"

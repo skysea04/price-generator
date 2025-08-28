@@ -1,6 +1,7 @@
 export interface ServiceItem {
   category: string;
   item: string;
+  content: string;
   price: number;
   count: number;
   unit: string;

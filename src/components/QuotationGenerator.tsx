@@ -25,7 +25,7 @@ const QuotationGenerator: React.FC = () => {
     quoterName: '',
     email: '',
     serviceItems: [
-      { category: '', item: '', price: 0, count: 1, unit: '', amount: 0 }
+      { category: '', item: '', content: '', price: 0, count: 1, unit: '', amount: 0 }
     ],
     excludingTax: 0,
     percentage: 5,
@@ -42,6 +42,7 @@ const QuotationGenerator: React.FC = () => {
   const [emailError, setEmailError] = useState<string>('');
   const [pasteMode, setPasteMode] = useState<'replace' | 'append'>('replace');
   const [pasteText, setPasteText] = useState<string>('');
+  const [showPasteSection, setShowPasteSection] = useState<boolean>(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -100,7 +101,7 @@ const QuotationGenerator: React.FC = () => {
       ...prev,
       serviceItems: [
         ...prev.serviceItems,
-        { category: '', item: '', price: 0, count: 1, unit: '', amount: 0 }
+        { category: '', item: '', content: '', price: 0, count: 1, unit: '', amount: 0 }
       ]
     }));
   };
@@ -135,10 +136,6 @@ const QuotationGenerator: React.FC = () => {
     setShowModal(true);
   };
 
-  const handlePreview = () => {
-    setIsPreview(true);
-    setShowModal(true);
-  };
 
   const handleExportAllData = () => {
     const exportData = {
@@ -262,7 +259,7 @@ const QuotationGenerator: React.FC = () => {
     // 檢查第一行是否為標題行
     const firstLine = lines[0].split(/\s{2,}|\t/).map(cell => cell.trim());
     const isHeaderRow = firstLine.some(cell =>
-      ['類別', '項目', '單價', '數量', '單位', '金額'].includes(cell)
+      ['類別', '項目', '內容', '單價', '數量', '單位', '金額'].includes(cell)
     );
 
     if (isHeaderRow) {
@@ -289,7 +286,28 @@ const QuotationGenerator: React.FC = () => {
         }
       }
 
-      if (cells.length >= 4) { // 至少需要類別、項目、單價、數量
+      if (cells.length >= 5) { // 至少需要類別、項目、內容、單價、數量
+        const category = cells[0] || '';
+        const item = cells[1] || '';
+        const content = cells[2] || '';
+        const price = parseFloat(cells[3]) || 0;
+        const count = parseInt(cells[4]) || 1;
+        const unit = cells[5] || '';
+        const amount = cells.length >= 7 ? parseFloat(cells[6]) || 0 : price * count;
+
+        // 只添加有效的項目（至少要有類別和項目名稱）
+        if (category && item) {
+          parsedItems.push({
+            category,
+            item,
+            content,
+            price,
+            count,
+            unit,
+            amount
+          });
+        }
+      } else if (cells.length >= 4) { // 兼容舊格式：類別、項目、單價、數量
         const category = cells[0] || '';
         const item = cells[1] || '';
         const price = parseFloat(cells[2]) || 0;
@@ -302,6 +320,7 @@ const QuotationGenerator: React.FC = () => {
           parsedItems.push({
             category,
             item,
+            content: '', // 舊格式沒有內容欄位，設為空字串
             price,
             count,
             unit,
@@ -321,91 +340,14 @@ const QuotationGenerator: React.FC = () => {
     // 如果無法解析，也靜默處理，不顯示錯誤彈窗
   };
 
-  const handlePasteFromInput = () => {
-    if (!pasteText.trim()) {
-      return; // 如果沒有內容，直接返回
-    }
-
-    const lines = pasteText.trim().split('\n').filter(line => line.trim());
-
-    if (lines.length === 0) {
-      return;
-    }
-
-    // 解析數據
-    const parsedItems: ServiceItem[] = [];
-    let startIndex = 0;
-
-    // 檢查第一行是否為標題行
-    const firstLine = lines[0].split(/\s{2,}|\t/).map(cell => cell.trim());
-    const isHeaderRow = firstLine.some(cell =>
-      ['類別', '項目', '單價', '數量', '單位', '金額'].includes(cell)
-    );
-
-    if (isHeaderRow) {
-      startIndex = 1;
-    }
-
-    // 解析數據行
-    for (let i = startIndex; i < lines.length; i++) {
-      const line = lines[i];
-
-      // 嘗試多種分隔符：Tab、多個空格、單個空格
-      let cells: string[] = [];
-
-      // 優先使用 Tab 分隔
-      if (line.includes('\t')) {
-        cells = line.split('\t').map(cell => cell.trim());
-      } else {
-        // 使用正則表達式分割多個空格
-        cells = line.split(/\s{2,}/).map(cell => cell.trim());
-
-        // 如果分割後只有一個元素，嘗試用單個空格分割
-        if (cells.length === 1 && line.includes(' ')) {
-          cells = line.split(' ').map(cell => cell.trim()).filter(cell => cell);
-        }
-      }
-
-      if (cells.length >= 4) { // 至少需要類別、項目、單價、數量
-        const category = cells[0] || '';
-        const item = cells[1] || '';
-        const price = parseFloat(cells[2]) || 0;
-        const count = parseInt(cells[3]) || 1;
-        const unit = cells[4] || '';
-        const amount = cells.length >= 6 ? parseFloat(cells[5]) || 0 : price * count;
-
-        // 只添加有效的項目（至少要有類別和項目名稱）
-        if (category && item) {
-          parsedItems.push({
-            category,
-            item,
-            price,
-            count,
-            unit,
-            amount
-          });
-        }
-      }
-    }
-
-    if (parsedItems.length > 0) {
-      setFormData(prev => ({
-        ...prev,
-        serviceItems: pasteMode === 'replace' ? parsedItems : [...prev.serviceItems, ...parsedItems]
-      }));
-      // 靜默處理，不顯示彈窗
-      setPasteText(''); // 清空輸入框
-    }
-    // 如果無法解析，也靜默處理，不顯示錯誤彈窗
-  };
 
   const handleCopyToClipboard = async () => {
     try {
-      const headers = ['類別', '項目', '單價', '數量', '單位', '金額'];
+      const headers = ['類別', '項目', '內容', '單價', '數量', '單位', '金額'];
       const rows = [
         headers.join('\t'),
         ...formData.serviceItems.map(item =>
-          [item.category, item.item, item.price, item.count, item.unit, item.amount].join('\t')
+          [item.category, item.item, item.content, item.price, item.count, item.unit, item.amount].join('\t')
         )
       ];
 
@@ -649,35 +591,30 @@ const QuotationGenerator: React.FC = () => {
             <div className="d-flex justify-content-between align-items-center mb-3">
               <h3 className="text-muted">服務項目</h3>
               <div className="d-flex gap-2 align-items-center">
-                <div className="form-check form-check-inline me-2">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="pasteMode"
-                    id="pasteModeReplace"
-                    value="replace"
-                    checked={pasteMode === 'replace'}
-                    onChange={(e) => setPasteMode(e.target.value as 'replace' | 'append')}
-                  />
-                  <label className="form-check-label small" htmlFor="pasteModeReplace">
-                    覆蓋現有項目
-                  </label>
-                </div>
-                <div className="form-check form-check-inline me-3">
-                  <input
-                    className="form-check-input"
-                    type="radio"
-                    name="pasteMode"
-                    id="pasteModeAppend"
-                    value="append"
-                    checked={pasteMode === 'append'}
-                    onChange={(e) => setPasteMode(e.target.value as 'replace' | 'append')}
-                  />
-                  <label className="form-check-label small" htmlFor="pasteModeAppend">
-                    新增到現有項目
-                  </label>
-                </div>
-
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary btn-sm"
+                  onClick={() => setShowPasteSection(!showPasteSection)}
+                  title="顯示或隱藏貼上欄位"
+                  style={{ 
+                    backgroundColor: '#17a2b8', 
+                    borderColor: '#17a2b8', 
+                    color: 'white',
+                    transition: 'all 0.2s ease-in-out'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#138496';
+                    e.currentTarget.style.borderColor = '#117a8b';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#17a2b8';
+                    e.currentTarget.style.borderColor = '#17a2b8';
+                    e.currentTarget.style.color = 'white';
+                  }}
+                >
+                  {showPasteSection ? '隱藏貼上欄位' : '顯示貼上欄位'}
+                </button>
                 <button
                   type="button"
                   className="btn btn-secondary btn-sm"
@@ -694,7 +631,7 @@ const QuotationGenerator: React.FC = () => {
                     if (window.confirm('確定要清空所有服務項目嗎？')) {
                       setFormData(prev => ({
                         ...prev,
-                        serviceItems: [{ category: '', item: '', price: 0, count: 1, unit: '', amount: 0 }]
+                        serviceItems: [{ category: '', item: '', content: '', price: 0, count: 1, unit: '', amount: 0 }]
                       }));
                     }
                   }}
@@ -715,41 +652,76 @@ const QuotationGenerator: React.FC = () => {
 
 
 
-            <div className="alert alert-info mb-3">
-              <small>
-                <strong>📋 貼上項目使用說明：</strong><br />
-                • 直接在下方輸入框中貼上 Excel/Google Sheets 的數據<br />
-                • 支援多種格式：空格分隔、Tab 分隔、或混合分隔符<br />
-                • 第一行如果是標題行會自動跳過<br />
-                • 貼上後會自動計算金額並按順序排列<br />
-                • <strong>覆蓋模式：</strong>清空現有項目並貼上新項目<br />
-                • <strong>新增模式：</strong>保留現有項目並在後面新增貼上的項目
-              </small>
-            </div>
+            {showPasteSection && (
+              <>
+                <div className="alert alert-info mb-3">
+                  <small>
+                    <strong>📋 貼上項目使用說明：</strong><br />
+                    • 直接在下方輸入框中貼上 Excel/Google Sheets 的數據<br />
+                    • 支援多種格式：空格分隔、Tab 分隔、或混合分隔符<br />
+                    • 第一行如果是標題行會自動跳過<br />
+                    • 貼上後會自動計算金額並按順序排列<br />
+                    • <strong>覆蓋模式：</strong>清空現有項目並貼上新項目<br />
+                    • <strong>新增模式：</strong>保留現有項目並在後面新增貼上的項目
+                  </small>
+                </div>
 
-            <div className="mb-3">
-              <div className="input-group">
-                <span className="input-group-text">📋</span>
-                <textarea
-                  className="form-control"
-                  rows={3}
-                  placeholder="從 Excel 或 Google Sheets 複製數據並貼上到這裡，會自動根據當前選擇的貼上策略處理..."
-                  value={pasteText}
-                  onChange={(e) => setPasteText(e.target.value)}
-                  onPaste={(e) => {
-                    // 阻止默認的貼上行為
-                    e.preventDefault();
+                <div className="d-flex gap-3 align-items-center mb-3">
+                  <div className="form-check form-check-inline">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="pasteMode"
+                      id="pasteModeReplace"
+                      value="replace"
+                      checked={pasteMode === 'replace'}
+                      onChange={(e) => setPasteMode(e.target.value as 'replace' | 'append')}
+                    />
+                    <label className="form-check-label" htmlFor="pasteModeReplace">
+                      覆蓋現有項目
+                    </label>
+                  </div>
+                  <div className="form-check form-check-inline">
+                    <input
+                      className="form-check-input"
+                      type="radio"
+                      name="pasteMode"
+                      id="pasteModeAppend"
+                      value="append"
+                      checked={pasteMode === 'append'}
+                      onChange={(e) => setPasteMode(e.target.value as 'replace' | 'append')}
+                    />
+                    <label className="form-check-label" htmlFor="pasteModeAppend">
+                      新增到現有項目
+                    </label>
+                  </div>
+                </div>
 
-                    // 獲取剪貼板中的純文本
-                    const clipboardData = e.clipboardData;
-                    const pastedText = clipboardData.getData('text');
+                <div className="mb-3">
+                  <div className="input-group">
+                    <span className="input-group-text">📋</span>
+                    <textarea
+                      className="form-control"
+                      rows={3}
+                      placeholder="從 Excel 或 Google Sheets 複製數據並貼上到這裡，會自動根據當前選擇的貼上策略處理..."
+                      value={pasteText}
+                      onChange={(e) => setPasteText(e.target.value)}
+                      onPaste={(e) => {
+                        // 阻止默認的貼上行為
+                        e.preventDefault();
 
-                    // 直接處理貼上的文本
-                    handlePasteText(pastedText);
-                  }}
-                />
-              </div>
-            </div>
+                        // 獲取剪貼板中的純文本
+                        const clipboardData = e.clipboardData;
+                        const pastedText = clipboardData.getData('text');
+
+                        // 直接處理貼上的文本
+                        handlePasteText(pastedText);
+                      }}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             <DndContext
               sensors={sensors}

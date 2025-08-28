@@ -10,11 +10,11 @@ interface QuotationModalProps {
   onClose: () => void;
 }
 
-const QuotationModal: React.FC<QuotationModalProps> = ({ 
-  data, 
-  logo, 
-  isPreview, 
-  onClose 
+const QuotationModal: React.FC<QuotationModalProps> = ({
+  data,
+  logo,
+  isPreview,
+  onClose
 }) => {
   const [isExporting, setIsExporting] = useState(false);
 
@@ -26,12 +26,12 @@ const QuotationModal: React.FC<QuotationModalProps> = ({
         const canvas = await html2canvas(element);
         const img = new Image();
         img.src = canvas.toDataURL('image/jpeg');
-        
+
         const link = document.createElement('a');
         link.href = img.src;
-        
+
         const dateString = data.startDate || new Date().toISOString().split('T')[0];
-        const fileName = data.quotationName 
+        const fileName = data.quotationName
           ? `${data.quotationName}_${dateString}.jpg`
           : `${new Date().toLocaleDateString('zh-TW')}_quotation.jpg`;
         link.download = fileName;
@@ -50,15 +50,14 @@ const QuotationModal: React.FC<QuotationModalProps> = ({
       try {
         const canvas = await html2canvas(element);
         const imgWidth = 208;
-        const pageHeight = 295;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
+
         const contentDataURL = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'mm', 'a4');
         pdf.addImage(contentDataURL, 'PNG', 0, 0, imgWidth, imgHeight);
-        
+
         const dateString = data.startDate || new Date().toISOString().split('T')[0];
-        const fileName = data.quotationName 
+        const fileName = data.quotationName
           ? `${data.quotationName}_${dateString}.pdf`
           : `${new Date().toLocaleDateString('zh-TW')}_quotation.pdf`;
         pdf.save(fileName);
@@ -138,26 +137,62 @@ const QuotationModal: React.FC<QuotationModalProps> = ({
                       <tr>
                         <th>類別</th>
                         <th>項目</th>
+                        <th>內容</th>
                         <th>單價</th>
                         <th>數量</th>
                         <th className="text-end">金額</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {data.serviceItems.map((item, index) => (
-                        <tr key={index}>
-                          <td>{item.category}</td>
-                          <td>{item.item}</td>
-                          <td>{item.price}</td>
-                          <td>
-                            {item.count}
-                            {item.unit && `/${item.unit}`}
-                          </td>
-                          <td className="text-end">NT$ {item.amount}</td>
-                        </tr>
-                      ))}
+                      {(() => {
+                        // 按類別分組
+                        const groupedItems = data.serviceItems.reduce((groups, item) => {
+                          const category = item.category || '未分類';
+                          if (!groups[category]) {
+                            groups[category] = [];
+                          }
+                          groups[category].push(item);
+                          return groups;
+                        }, {} as Record<string, typeof data.serviceItems>);
+
+                        const rows: React.JSX.Element[] = [];
+                        let globalIndex = 0;
+
+                        Object.entries(groupedItems).forEach(([category, items]) => {
+                          items.forEach((item, itemIndex) => {
+                            rows.push(
+                              <tr key={globalIndex}>
+                                {itemIndex === 0 && (
+                                  <td
+                                    rowSpan={items.length}
+                                    className="align-middle fw-bold"
+                                    style={{
+                                      backgroundColor: '#f8f9fa',
+                                      borderRight: '2px solid #dee2e6',
+                                      verticalAlign: 'middle'
+                                    }}
+                                  >
+                                    {category}
+                                  </td>
+                                )}
+                                <td>{item.item}</td>
+                                <td>{item.content}</td>
+                                <td>{item.price}</td>
+                                <td>
+                                  {item.count}
+                                  {item.unit && `/${item.unit}`}
+                                </td>
+                                <td className="text-end">NT$ {item.amount}</td>
+                              </tr>
+                            );
+                            globalIndex++;
+                          });
+                        });
+
+                        return rows;
+                      })()}
                       <tr>
-                        <td colSpan={5} className="text-end">
+                        <td colSpan={6} className="text-end">
                           <div className="d-flex flex-column align-items-end">
                             <div className="mb-1">
                               <span>未稅：NT$ </span>
